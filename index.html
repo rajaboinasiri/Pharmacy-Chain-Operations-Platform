@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedAxis Retail — Operations Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #21262d;
+  --bg4: #30363d;
+  --border: rgba(240,246,252,0.1);
+  --border2: rgba(240,246,252,0.18);
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --text3: #6e7681;
+  --accent: #2ea043;
+  --accent2: #3fb950;
+  --blue: #388bfd;
+  --blue2: #58a6ff;
+  --amber: #d29922;
+  --amber2: #e3b341;
+  --red: #da3633;
+  --red2: #f85149;
+  --purple: #8957e5;
+  --purple2: #a5d6ff;
+  --teal: #1f6feb;
+  --mono: 'DM Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --sidebar-w: 220px;
+  --topbar-h: 56px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5;overflow:hidden}
+
+/* ─── LAYOUT ─────────────────────────────── */
+#app{display:flex;height:100vh;overflow:hidden}
+#sidebar{width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#topbar{height:var(--topbar-h);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+#content{flex:1;overflow-y:auto;padding:24px}
+
+/* ─── LOGIN ──────────────────────────────── */
+#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100}
+.login-card{width:380px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:36px}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.login-logo .icon{width:36px;height:36px;background:linear-gradient(135deg,#2ea043,#1a7a2e);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.login-logo h1{font-size:20px;font-weight:600;letter-spacing:-0.3px}
+.login-logo span{font-size:11px;color:var(--text2);display:block;margin-top:1px}
+.field-group{margin-bottom:16px}
+.field-group label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:500;letter-spacing:0.3px;text-transform:uppercase}
+.field-group input,.field-group select{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 12px;color:var(--text);font-family:var(--sans);font-size:14px;outline:none;transition:border-color .15s}
+.field-group input:focus,.field-group select:focus{border-color:var(--accent)}
+.login-hint{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:16px;font-size:12px;color:var(--text2)}
+.login-hint .demo-row{display:flex;justify-content:space-between;margin-bottom:4px}
+.login-hint .demo-row:last-child{margin-bottom:0}
+.login-hint .tag{background:var(--bg4);padding:1px 6px;border-radius:4px;font-family:var(--mono);font-size:11px;color:var(--text)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 16px;border-radius:var(--radius);font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;border:none;outline:none}
+.btn-primary{background:var(--accent);color:#fff;width:100%}
+.btn-primary:hover{background:var(--accent2)}
+.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}
+.btn-secondary:hover{background:var(--bg4)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-danger{background:rgba(218,54,51,0.15);color:var(--red2);border:1px solid rgba(218,54,51,0.3)}
+.btn-danger:hover{background:rgba(218,54,51,0.25)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-icon{width:30px;height:30px;padding:0;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2)}
+.btn-icon:hover{color:var(--text);background:var(--bg4)}
+
+/* ─── SIDEBAR ─────────────────────────────── */
+.sidebar-header{padding:16px;border-bottom:1px solid var(--border)}
+.sidebar-logo{display:flex;align-items:center;gap:8px}
+.sidebar-logo .icon{width:28px;height:28px;background:linear-gradient(135deg,#2ea043,#1a7a2e);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sidebar-logo h2{font-size:14px;font-weight:600;letter-spacing:-0.2px}
+.sidebar-logo span{font-size:10px;color:var(--text3);display:block}
+nav{flex:1;overflow-y:auto;padding:8px}
+.nav-section{margin-bottom:4px}
+.nav-section-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:0.8px;text-transform:uppercase;padding:8px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;cursor:pointer;transition:all .12s;color:var(--text2);font-size:13px;font-weight:400;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(46,160,67,0.15);color:var(--accent2);font-weight:500}
+.nav-item .icon{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.nav-item .badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:1px 5px;border-radius:10px;font-family:var(--mono)}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:8px}
+.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:10px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ─── TOPBAR ─────────────────────────────── */
+.page-title{font-size:15px;font-weight:600;flex:1;letter-spacing:-0.2px}
+.topbar-actions{display:flex;align-items:center;gap:8px}
+.store-select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:5px 10px;color:var(--text2);font-family:var(--sans);font-size:12px;outline:none;cursor:pointer}
+.store-select:focus{border-color:var(--accent)}
+.notif-badge{position:relative;display:inline-flex}
+.notif-dot{position:absolute;top:2px;right:2px;width:7px;height:7px;background:var(--red2);border-radius:50%;border:1.5px solid var(--bg2)}
+
+/* ─── CARDS ──────────────────────────────── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px}
+.card-sm{padding:14px 16px}
+.card-title{font-size:12px;font-weight:500;color:var(--text2);letter-spacing:0.3px;text-transform:uppercase;margin-bottom:12px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px}
+.kpi-label{font-size:11px;color:var(--text3);font-weight:500;letter-spacing:0.3px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.kpi-value{font-size:24px;font-weight:600;letter-spacing:-0.5px;line-height:1}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:4px}
+.kpi-up{color:var(--accent2)}
+.kpi-down{color:var(--red2)}
+.kpi-warn{color:var(--amber2)}
+
+/* ─── TABLES ─────────────────────────────── */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;font-weight:500;color:var(--text3);letter-spacing:0.4px;text-transform:uppercase;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,0.02)}
+.mono{font-family:var(--mono);font-size:12px}
+
+/* ─── BADGES ─────────────────────────────── */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;gap:4px}
+.badge-green{background:rgba(46,160,67,0.15);color:var(--accent2)}
+.badge-red{background:rgba(218,54,51,0.15);color:var(--red2)}
+.badge-amber{background:rgba(210,153,34,0.15);color:var(--amber2)}
+.badge-blue{background:rgba(56,139,253,0.15);color:var(--blue2)}
+.badge-purple{background:rgba(137,87,229,0.15);color:#b083f0}
+.badge-gray{background:var(--bg4);color:var(--text2)}
+
+/* ─── ALERTS & NOTIFICATIONS ─────────────── */
+.alert-item{display:flex;align-items:flex-start;gap:10px;padding:12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg3);margin-bottom:8px;transition:all .15s}
+.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.alert-dot.red{background:var(--red2)}
+.alert-dot.amber{background:var(--amber2)}
+.alert-dot.blue{background:var(--blue2)}
+.alert-title{font-size:13px;font-weight:500;margin-bottom:2px}
+.alert-sub{font-size:12px;color:var(--text3)}
+
+/* ─── CHART BARS ─────────────────────────── */
+.bar-chart{display:flex;flex-direction:column;gap:8px}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-label{font-size:12px;color:var(--text2);width:160px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.bar-val{font-size:12px;font-family:var(--mono);color:var(--text2);width:80px;text-align:right;flex-shrink:0}
+
+/* ─── TREND LINE ─────────────────────────── */
+.sparkline{display:flex;align-items:flex-end;gap:3px;height:40px}
+.spark-bar{flex:1;background:rgba(46,160,67,0.4);border-radius:2px 2px 0 0;transition:height .4s}
+.spark-bar:last-child{background:var(--accent2)}
+
+/* ─── INVENTORY ──────────────────────────── */
+.stock-level{display:flex;align-items:center;gap:8px}
+.stock-bar{width:60px;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;flex-shrink:0}
+.stock-fill{height:100%;border-radius:3px}
+.stock-ok{background:var(--accent)}
+.stock-warn{background:var(--amber)}
+.stock-crit{background:var(--red2)}
+
+/* ─── TRANSFERS ──────────────────────────── */
+.transfer-flow{display:flex;align-items:center;gap:8px;font-size:12px}
+.transfer-store{background:var(--bg4);padding:3px 8px;border-radius:4px;font-weight:500}
+.transfer-arrow{color:var(--text3)}
+
+/* ─── AI PANEL ───────────────────────────── */
+.chat-container{display:flex;flex-direction:column;height:420px}
+.chat-messages{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-bottom:12px}
+.msg{max-width:85%;padding:10px 13px;border-radius:10px;font-size:13px;line-height:1.5}
+.msg-user{align-self:flex-end;background:rgba(46,160,67,0.15);border:1px solid rgba(46,160,67,0.25);color:var(--text)}
+.msg-ai{align-self:flex-start;background:var(--bg3);border:1px solid var(--border);color:var(--text)}
+.msg-meta{font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono)}
+.chat-input-row{display:flex;gap:8px;margin-top:auto}
+.chat-input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;transition:border-color .15s}
+.chat-input:focus{border-color:var(--accent)}
+.suggestion-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{background:var(--bg4);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--text2);cursor:pointer;transition:all .12s}
+.chip:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
+
+/* ─── FORMS ──────────────────────────────── */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px;letter-spacing:0.3px;text-transform:uppercase}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 11px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;transition:border-color .15s}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:50;backdrop-filter:blur(2px)}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:24px;width:460px;max-height:80vh;overflow-y:auto}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:16px;font-weight:600}
+
+/* ─── STATUS INDICATORS ──────────────────── */
+.pulse{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent2);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ─── ANOMALY CARDS ──────────────────────── */
+.anomaly-card{border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;background:var(--bg3);transition:all .15s}
+.anomaly-card.high{border-left:3px solid var(--red2)}
+.anomaly-card.medium{border-left:3px solid var(--amber2)}
+.anomaly-card.resolved{opacity:0.5}
+.anomaly-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px}
+.anomaly-score{font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:4px}
+
+/* ─── SCROLLBAR ──────────────────────────── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--border2)}
+
+/* ─── LOADING ─────────────────────────────── */
+.loading{display:flex;align-items:center;justify-content:center;height:200px;color:var(--text3);font-size:13px;gap:8px}
+.spinner{width:16px;height:16px;border:2px solid var(--bg4);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ─── SECTION SPACING ─────────────────────── */
+.section{margin-bottom:24px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-title{font-size:14px;font-weight:600;letter-spacing:-0.2px;display:flex;align-items:center;gap:8px}
+.divider{height:1px;background:var(--border);margin:20px 0}
+
+/* ─── ANIMATIONS ─────────────────────────── */
+.fade-in{animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:12px 16px;font-size:13px;z-index:200;display:flex;align-items:center;gap:8px;animation:slideUp .2s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ──────────────────────────────────────────────────────── -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="icon">⚕</div>
+      <div>
+        <h1>MedAxis Retail</h1>
+        <span>Pharmacy Operations Platform</span>
+      </div>
+    </div>
+    <div class="login-hint">
+      <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px">Demo credentials</div>
+      <div class="demo-row"><span>admin@medaxis.in</span><span class="tag">admin123</span></div>
+      <div class="demo-row"><span>supervisor@medaxis.in</span><span class="tag">super123</span></div>
+      <div class="demo-row"><span>pharma@medaxis.in</span><span class="tag">pharma123</span></div>
+      <div class="demo-row"><span>inventory@medaxis.in</span><span class="tag">inv123</span></div>
+    </div>
+    <div class="field-group">
+      <label>Email</label>
+      <input type="email" id="login-email" value="admin@medaxis.in" placeholder="Enter email">
+    </div>
+    <div class="field-group">
+      <label>Password</label>
+      <input type="password" id="login-password" value="admin123" placeholder="Enter password">
+    </div>
+    <button class="btn btn-primary" onclick="doLogin()" id="login-btn">Sign in</button>
+    <div id="login-error" style="color:var(--red2);font-size:12px;margin-top:10px;text-align:center;display:none"></div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ──────────────────────────────────────────────────────────── -->
+<div id="app" style="display:none">
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="icon">⚕</div>
+        <div>
+          <h2>MedAxis</h2>
+          <span>37 stores · Hyderabad</span>
+        </div>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-section">
+        <div class="nav-section-label">Operations</div>
+        <button class="nav-item active" onclick="navigate('dashboard')">
+          <span class="icon">▦</span> Dashboard
+        </button>
+        <button class="nav-item" onclick="navigate('inventory')">
+          <span class="icon">⊞</span> Inventory
+        </button>
+        <button class="nav-item" onclick="navigate('billing')">
+          <span class="icon">◈</span> Billing / POS
+        </button>
+        <button class="nav-item" onclick="navigate('transfers')">
+          <span class="icon">⇄</span> Stock Transfers
+          <span class="badge" id="transfer-badge">1</span>
+        </button>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Monitoring</div>
+        <button class="nav-item" onclick="navigate('alerts')">
+          <span class="icon">◎</span> Alerts
+          <span class="badge" id="alert-badge">4</span>
+        </button>
+        <button class="nav-item" onclick="navigate('expiry')">
+          <span class="icon">◷</span> Expiry Mgmt
+        </button>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Intelligence</div>
+        <button class="nav-item" onclick="navigate('ai')">
+          <span class="icon">◉</span> AI Insights
+        </button>
+        <button class="nav-item" onclick="navigate('reports')">
+          <span class="icon">◫</span> Reports
+        </button>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="avatar" id="sidebar-avatar">A</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-name">Loading...</div>
+          <div class="user-role" id="sidebar-role">—</div>
+        </div>
+        <button class="btn-icon" onclick="doLogout()" title="Logout" style="font-size:12px">⏻</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div id="main">
+    <div id="topbar">
+      <div class="page-title" id="page-title">Dashboard</div>
+      <div class="topbar-actions">
+        <select class="store-select" id="store-filter" onchange="onStoreChange()">
+          <option value="">All Stores</option>
+        </select>
+        <div class="notif-badge">
+          <button class="btn-icon" onclick="navigate('alerts')" title="Alerts">🔔</button>
+          <div class="notif-dot" id="notif-dot"></div>
+        </div>
+        <button class="btn btn-sm btn-secondary" onclick="navigate('billing')">+ New Sale</button>
+      </div>
+    </div>
+    <div id="content"></div>
+  </div>
+</div>
+
+<!-- ── MODAL ──────────────────────────────────────────────────────────────── -->
+<div id="modal-overlay" class="modal-overlay" style="display:none" onclick="closeModal(event)">
+  <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
+</div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────
+const API = 'http://localhost:8000';
+let token = null, currentUser = null, currentPage = 'dashboard', selectedStore = '';
+let dashboardData = null;
+
+// ── API helpers ───────────────────────────────────────────────────────────
+async function api(method, path, body) {
+  const opts = {method, headers: {'Content-Type':'application/json'}};
+  if (token) opts.headers['Authorization'] = `Bearer ${token}`;
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const r = await fetch(API + path, opts);
+    if (r.status === 401) { doLogout(); return null; }
+    if (!r.ok) { const e = await r.json(); throw new Error(e.detail || 'Request failed'); }
+    return r.json();
+  } catch(e) {
+    if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+      // Use mock data if backend not running
+      return mockResponse(method, path, body);
+    }
+    showToast('⚠ ' + e.message, 'amber');
+    return null;
+  }
+}
+
+// Mock data fallback when backend isn't running
+function mockResponse(method, path, body) {
+  const now = new Date();
+  const fmt = d => d.toISOString().split('T')[0];
+
+  if (path === '/auth/login') {
+    const users = {
+      'admin@medaxis.in':      {id:'u1',name:'Arjun Mehta',role:'superadmin',store_id:null},
+      'supervisor@medaxis.in': {id:'u2',name:'Priya Sharma',role:'regional_supervisor',store_id:null},
+      'pharma@medaxis.in':     {id:'u3',name:'Dr. Kavita Rao',role:'pharmacist',store_id:'S001'},
+      'inventory@medaxis.in':  {id:'u4',name:'Ravi Nair',role:'inventory_controller',store_id:'S002'},
+    };
+    const pwds = {'admin@medaxis.in':'admin123','supervisor@medaxis.in':'super123','pharma@medaxis.in':'pharma123','inventory@medaxis.in':'inv123'};
+    const u = users[body.email];
+    if (!u || pwds[body.email] !== body.password) return null;
+    return {access_token:'mock_token_'+body.email, user:{...u, email:body.email}};
+  }
+  if (path === '/auth/logout') return {message:'ok'};
+  if (path === '/stores') return [
+    {id:'S001',name:'MedAxis - Banjara Hills',city:'Hyderabad',type:'urban'},
+    {id:'S002',name:'MedAxis - Kondapur',city:'Hyderabad',type:'urban'},
+    {id:'S003',name:'MedAxis - Miyapur',city:'Hyderabad',type:'semi-urban'},
+    {id:'S004',name:'MedAxis - Secunderabad',city:'Hyderabad',type:'urban'},
+    {id:'S005',name:'MedAxis - LB Nagar',city:'Hyderabad',type:'semi-urban'},
+  ];
+  if (path === '/inventory/products') return [
+    {sku_id:'SKU001',name:'Paracetamol 500mg',category:'Analgesic',unit:'Strip(10)',price:18.50,reorder_pt:50},
+    {sku_id:'SKU002',name:'Amoxicillin 250mg',category:'Antibiotic',unit:'Strip(10)',price:85.00,reorder_pt:30},
+    {sku_id:'SKU003',name:'Metformin 500mg',category:'Antidiabetic',unit:'Strip(10)',price:42.00,reorder_pt:40},
+    {sku_id:'SKU004',name:'Atorvastatin 10mg',category:'Cardiac',unit:'Strip(10)',price:120.00,reorder_pt:25},
+    {sku_id:'SKU005',name:'Cetirizine 10mg',category:'Antiallergic',unit:'Strip(10)',price:28.00,reorder_pt:60},
+    {sku_id:'SKU006',name:'Omeprazole 20mg',category:'Antacid',unit:'Strip(10)',price:55.00,reorder_pt:35},
+    {sku_id:'SKU007',name:'Azithromycin 500mg',category:'Antibiotic',unit:'Strip(3)',price:95.00,reorder_pt:20},
+    {sku_id:'SKU008',name:'Vitamin D3 60K',category:'Supplement',unit:'Capsule',price:32.00,reorder_pt:45},
+    {sku_id:'SKU009',name:'Insulin Glargine 100U',category:'Antidiabetic',unit:'Vial',price:890.00,reorder_pt:10},
+    {sku_id:'SKU010',name:'Pantoprazole 40mg',category:'Antacid',unit:'Strip(10)',price:68.00,reorder_pt:30},
+  ];
+  if (path.startsWith('/inventory/stock')) {
+    const prods = mockResponse('GET','/inventory/products');
+    const stores = mockResponse('GET','/stores');
+    const r=[];
+    for(const s of stores) for(const p of prods) {
+      const qty=[3,8,4,12,95,140,55,80,30,120][prods.indexOf(p)] || Math.floor(Math.random()*150)+10;
+      r.push({store_id:s.id,sku_id:p.sku_id,qty_on_hand:qty,reorder_point:p.reorder_pt,
+               name:p.name,category:p.category,price:p.price,store_name:s.name});
+    }
+    const sp = new URLSearchParams(path.split('?')[1]||'');
+    const sid = sp.get('store_id');
+    return sid ? r.filter(i=>i.store_id===sid) : r;
+  }
+  if (path.startsWith('/inventory/alerts/low-stock')) return [
+    {store_id:'S001',sku_id:'SKU009',qty_on_hand:3,reorder_point:10,name:'Insulin Glargine 100U',category:'Antidiabetic',store_name:'MedAxis - Banjara Hills',severity:'critical'},
+    {store_id:'S002',sku_id:'SKU007',qty_on_hand:4,reorder_point:20,name:'Azithromycin 500mg',category:'Antibiotic',store_name:'MedAxis - Kondapur',severity:'critical'},
+    {store_id:'S003',sku_id:'SKU002',qty_on_hand:8,reorder_point:30,name:'Amoxicillin 250mg',category:'Antibiotic',store_name:'MedAxis - Miyapur',severity:'warning'},
+    {store_id:'S001',sku_id:'SKU004',qty_on_hand:12,reorder_point:25,name:'Atorvastatin 10mg',category:'Cardiac',store_name:'MedAxis - Banjara Hills',severity:'warning'},
+  ];
+  if (path.startsWith('/inventory/alerts/expiry')) return [
+    {batch_id:'B0001',sku_id:'SKU001',store_id:'S001',lot_no:'LOT4521',exp_date:fmt(new Date(now-5*86400000)),qty:45,name:'Paracetamol 500mg',store_name:'MedAxis - Banjara Hills',status:'expired',expires_in_days:-5},
+    {batch_id:'B0014',sku_id:'SKU005',store_id:'S002',lot_no:'LOT2233',exp_date:fmt(new Date(now+7*86400000)),qty:30,name:'Cetirizine 10mg',store_name:'MedAxis - Kondapur',status:'expiring_soon',expires_in_days:7},
+    {batch_id:'B0008',sku_id:'SKU003',store_id:'S001',lot_no:'LOT8812',exp_date:fmt(new Date(now+15*86400000)),qty:20,name:'Metformin 500mg',store_name:'MedAxis - Banjara Hills',status:'expiring_soon',expires_in_days:15},
+    {batch_id:'B0022',sku_id:'SKU006',store_id:'S003',lot_no:'LOT5567',exp_date:fmt(new Date(now+28*86400000)),qty:60,name:'Omeprazole 20mg',store_name:'MedAxis - Miyapur',status:'expiring_soon',expires_in_days:28},
+  ];
+  if (path === '/inventory/transfers' || path.startsWith('/inventory/transfers?')) return [
+    {transfer_id:'TRF001',from_store:'S003',to_store:'S001',sku_id:'SKU009',sku_name:'Insulin Glargine 100U',qty:20,status:'pending',initiated_by:'Ravi Nair',created_at:now.toISOString(),from_store_name:'MedAxis - Miyapur',to_store_name:'MedAxis - Banjara Hills'},
+    {transfer_id:'TRF002',from_store:'S004',to_store:'S002',sku_id:'SKU007',sku_name:'Azithromycin 500mg',qty:30,status:'approved',initiated_by:'Dr. Kavita Rao',created_at:new Date(now-7200000).toISOString(),from_store_name:'MedAxis - Secunderabad',to_store_name:'MedAxis - Kondapur'},
+    {transfer_id:'TRF003',from_store:'S002',to_store:'S003',sku_id:'SKU002',sku_name:'Amoxicillin 250mg',qty:50,status:'in_transit',initiated_by:'Ravi Nair',created_at:new Date(now-86400000).toISOString(),from_store_name:'MedAxis - Kondapur',to_store_name:'MedAxis - Miyapur'},
+  ];
+  if (path === '/billing/sales' || path.startsWith('/billing/sales?')) {
+    const stores = ['S001','S002','S003','S004','S005'];
+    const snames = {'S001':'Banjara Hills','S002':'Kondapur','S003':'Miyapur','S004':'Secunderabad','S005':'LB Nagar'};
+    const modes = ['UPI','Cash','Card'];
+    return Array.from({length:20},(_,i)=>({
+      sale_id:`INV${String(i+1).padStart(6,'0')}`,
+      store_id:stores[i%5],store_name:'MedAxis - '+snames[stores[i%5]],
+      date:fmt(new Date(now-(i*3600000))),
+      total:Math.round(Math.random()*2000+200),
+      items:Math.floor(Math.random()*4)+1,
+      payment_mode:modes[i%3],gst:Math.round(Math.random()*200+20),
+    }));
+  }
+  if (method === 'POST' && path === '/billing/sales') {
+    const prods = mockResponse('GET','/inventory/products');
+    const pm = {p:prods};
+    let total=0;
+    const items = (body.items||[]).map(it=>{
+      const p=prods.find(x=>x.sku_id===it.sku_id)||prods[0];
+      const lt=p.price*it.qty; total+=lt;
+      return {sku_id:it.sku_id,name:p.name,qty:it.qty,unit_price:p.price,total:lt};
+    });
+    const gst=Math.round(total*0.12*100)/100;
+    return {sale_id:`INV${String(Math.floor(Math.random()*99999)).padStart(6,'0')}`,store_id:body.store_id,
+      date:fmt(now),total:Math.round(total*100)/100,gst,grand_total:Math.round((total+gst)*100)/100,
+      items,payment_mode:body.payment_mode,cashier:currentUser?.name||'Staff',timestamp:now.toISOString()};
+  }
+  if (path === '/reports/dashboard') return {
+    kpis:{today_revenue:148250,today_transactions:342,month_revenue:4280000,yoy_growth:12.4,low_stock_alerts:4,expiry_alerts:6,active_stores:37,pending_transfers:1},
+    store_revenue:[
+      {store_id:'S001',store_name:'MedAxis - Banjara Hills',revenue:980000},
+      {store_id:'S002',store_name:'MedAxis - Kondapur',revenue:870000},
+      {store_id:'S004',store_name:'MedAxis - Secunderabad',revenue:820000},
+      {store_id:'S003',store_name:'MedAxis - Miyapur',revenue:680000},
+      {store_id:'S005',store_name:'MedAxis - LB Nagar',revenue:540000},
+    ],
+    daily_trend:[
+      {date:fmt(new Date(now-6*86400000)),revenue:132000},
+      {date:fmt(new Date(now-5*86400000)),revenue:145000},
+      {date:fmt(new Date(now-4*86400000)),revenue:138000},
+      {date:fmt(new Date(now-3*86400000)),revenue:162000},
+      {date:fmt(new Date(now-2*86400000)),revenue:155000},
+      {date:fmt(new Date(now-1*86400000)),revenue:171000},
+      {date:fmt(now),revenue:148250},
+    ],
+    top_products:[
+      {name:'Paracetamol 500mg',units_sold:1240,revenue:22940},
+      {name:'Metformin 500mg',units_sold:980,revenue:41160},
+      {name:'Omeprazole 20mg',units_sold:870,revenue:47850},
+      {name:'Cetirizine 10mg',units_sold:760,revenue:21280},
+      {name:'Atorvastatin 10mg',units_sold:650,revenue:78000},
+    ]
+  };
+  if (path === '/ai/anomalies') return [
+    {id:'AN001',type:'unusual_stock_movement',store_id:'S001',sku_id:'SKU009',description:'Insulin Glargine stock dropped 45 units in 2 hours — 3× daily average',score:0.91,severity:'high',timestamp:now.toISOString(),resolved:false,store_name:'MedAxis - Banjara Hills',sku_name:'Insulin Glargine 100U'},
+    {id:'AN002',type:'suspicious_transaction',store_id:'S003',sku_id:'SKU002',description:'5 transactions for Amoxicillin without valid Rx within 30 min',score:0.78,severity:'medium',timestamp:new Date(now-3600000).toISOString(),resolved:false,store_name:'MedAxis - Miyapur',sku_name:'Amoxicillin 250mg'},
+    {id:'AN003',type:'price_anomaly',store_id:'S004',sku_id:'SKU004',description:'Atorvastatin sold at ₹45 — 62% below MRP. Possible billing error.',score:0.85,severity:'high',timestamp:new Date(now-10800000).toISOString(),resolved:true,store_name:'MedAxis - Secunderabad',sku_name:'Atorvastatin 10mg'},
+  ];
+  if (path.startsWith('/ai/forecast/')) {
+    const sku = path.split('/').pop();
+    const prods = mockResponse('GET','/inventory/products');
+    const p = prods.find(x=>x.sku_id===sku)||prods[0];
+    const base = Math.floor(Math.random()*60)+40;
+    const preds = Array.from({length:14},(_,i)=>({
+      date:fmt(new Date(now+(i+1)*86400000)),
+      predicted_units:base+Math.floor(Math.random()*20)-5+(i%7===5?8:0),
+      lower_bound:base-15,upper_bound:base+25
+    }));
+    return {sku_id:sku,sku_name:p.name,model:'Prophet + ARIMA ensemble',confidence:0.87,
+      recommendations:[`Reorder ${base*2} units by ${fmt(new Date(now+3*86400000))}`,
+        'Demand peaks on weekends — pre-stock Friday',
+        `Stock sufficient for ${(Math.floor(Math.random()*3)+3)}.${Math.floor(Math.random()*9)} days`],predictions:preds};
+  }
+  if (method==='POST' && path==='/ai/query') {
+    const q = (body.question||'').toLowerCase();
+    if (q.includes('low stock')||q.includes('reorder')) return {answer:'There are 4 low-stock items. Critical: Insulin Glargine at Banjara Hills (3 units), Azithromycin at Kondapur (4 units). Recommend immediate reorder.',data_source:'inventory.stock_levels',confidence:0.95};
+    if (q.includes('revenue')||q.includes('sales')) return {answer:"Today's revenue is ₹1,48,250 across all stores. Month-to-date: ₹42,80,000 — up 12.4% vs last month.",data_source:'billing.sales',confidence:0.98};
+    if (q.includes('expir')||q.includes('wastage')) return {answer:'6 batches expiring within 30 days. 1 already expired (Paracetamol 500mg, Banjara Hills — 45 units). Estimated wastage risk: ₹7,200.',data_source:'inventory.batches',confidence:0.92};
+    if (q.includes('transfer')) return {answer:'3 active transfers. 1 pending approval (Insulin Glargine, 20 units from Miyapur → Banjara Hills). Recommend approval given critical stock levels.',data_source:'inventory.transfers',confidence:0.96};
+    return {answer:'Based on current data: All 37 stores operational. 450,000+ inventory records tracked. Month revenue trending 12.4% above last month. 4 active AI anomaly flags require attention.',data_source:'reporting.summary',confidence:0.75};
+  }
+  if (method==='PATCH' && path.includes('/transfers/') && path.endsWith('/status')) return {status:body.status};
+  if (method==='PATCH' && path.includes('/anomalies/') && path.endsWith('/resolve')) return {resolved:true};
+  if (method==='POST' && path==='/inventory/transfers') {
+    const prods=mockResponse('GET','/inventory/products');
+    const stores=mockResponse('GET','/stores');
+    const p=prods.find(x=>x.sku_id===body.sku_id)||prods[0];
+    const fs=stores.find(x=>x.id===body.from_store)||stores[0];
+    const ts=stores.find(x=>x.id===body.to_store)||stores[1];
+    return {transfer_id:'TRF00'+Math.floor(Math.random()*99+4),from_store:body.from_store,to_store:body.to_store,sku_id:body.sku_id,sku_name:p.name,qty:body.qty,status:'pending',initiated_by:currentUser?.name||'Staff',created_at:new Date().toISOString(),from_store_name:fs.name,to_store_name:ts.name};
+  }
+  return null;
+}
+
+function fmt_currency(n) { return '₹' + Number(n).toLocaleString('en-IN', {maximumFractionDigits:0}); }
+function fmt_date(s) { return new Date(s).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'2-digit'}); }
+function fmt_time(s) { return new Date(s).toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'}); }
+function role_label(r) {
+  return {superadmin:'Super Admin',regional_supervisor:'Regional Supervisor',pharmacist:'Pharmacist',inventory_controller:'Inventory Controller'}[r]||r;
+}
+function initials(n) { return (n||'U').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase(); }
+
+function showToast(msg, type='green') {
+  const t = document.createElement('div');
+  const c = {green:'var(--accent2)',amber:'var(--amber2)',red:'var(--red2)'}[type]||'var(--accent2)';
+  t.className='toast'; t.style.borderLeftColor=c; t.style.borderLeftWidth='3px';
+  t.innerHTML = msg; document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(10px)';t.style.transition='all .3s';setTimeout(()=>t.remove(),300)}, 2500);
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-btn');
+  btn.textContent = 'Signing in...'; btn.disabled = true;
+  const r = await api('POST', '/auth/login', {email, password});
+  btn.textContent = 'Sign in'; btn.disabled = false;
+  if (!r) { document.getElementById('login-error').style.display='block'; document.getElementById('login-error').textContent='Invalid credentials'; return; }
+  token = r.access_token; currentUser = r.user;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  document.getElementById('sidebar-name').textContent = currentUser.name;
+  document.getElementById('sidebar-role').textContent = role_label(currentUser.role);
+  document.getElementById('sidebar-avatar').textContent = initials(currentUser.name);
+  await loadStores(); navigate('dashboard');
+}
+
+async function doLogout() {
+  await api('POST', '/auth/logout');
+  token=null; currentUser=null;
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────
+async function navigate(page) {
+  currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(b=>{
+    b.classList.toggle('active', b.textContent.trim().toLowerCase().startsWith(
+      {dashboard:'dashboard',inventory:'inventory',billing:'billing',transfers:'stock',
+       alerts:'alerts',expiry:'expiry',ai:'ai',reports:'reports'}[page]||page));
+  });
+  const titles = {dashboard:'Dashboard',inventory:'Inventory',billing:'Billing & POS',
+    transfers:'Stock Transfers',alerts:'Alerts & Notifications',expiry:'Expiry Management',
+    ai:'AI Insights',reports:'Reports & Analytics'};
+  document.getElementById('page-title').textContent = titles[page]||page;
+  document.getElementById('content').innerHTML = '<div class="loading"><div class="spinner"></div> Loading...</div>';
+  const pages = {dashboard:renderDashboard, inventory:renderInventory, billing:renderBilling,
+    transfers:renderTransfers, alerts:renderAlerts, expiry:renderExpiry, ai:renderAI, reports:renderReports};
+  if (pages[page]) await pages[page]();
+}
+
+async function loadStores() {
+  const stores = await api('GET','/stores');
+  if (!stores) return;
+  const sel = document.getElementById('store-filter');
+  stores.forEach(s=>{ const o=document.createElement('option'); o.value=s.id; o.textContent=s.name.replace('MedAxis - ',''); sel.appendChild(o); });
+}
+
+function onStoreChange() { selectedStore = document.getElementById('store-filter').value; if(currentPage==='inventory'||currentPage==='billing') navigate(currentPage); }
+
+// ── Dashboard ─────────────────────────────────────────────────────────────
+async function renderDashboard() {
+  const d = await api('GET','/reports/dashboard');
+  if (!d) return;
+  dashboardData = d;
+  const k = d.kpis;
+  const maxRev = Math.max(...d.store_revenue.map(s=>s.revenue));
+  const maxBar = Math.max(...d.daily_trend.map(t=>t.revenue));
+
+  document.getElementById('content').innerHTML = `
+  <div class="fade-in">
+  <div class="section">
+    <div class="grid-4">
+      <div class="kpi-card">
+        <div class="kpi-label">Today's Revenue <span class="pulse"></span></div>
+        <div class="kpi-value">${fmt_currency(k.today_revenue)}</div>
+        <div class="kpi-sub kpi-up">↑ ${k.yoy_growth}% vs last month</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Transactions Today</div>
+        <div class="kpi-value">${k.today_transactions}</div>
+        <div class="kpi-sub" style="color:var(--text3)">Across all stores</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Low Stock Alerts</div>
+        <div class="kpi-value kpi-down">${k.low_stock_alerts}</div>
+        <div class="kpi-sub" style="color:var(--text3)"><a href="#" onclick="navigate('alerts')" style="color:var(--red2)">View alerts →</a></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Month Revenue</div>
+        <div class="kpi-value">${fmt_currency(k.month_revenue)}</div>
+        <div class="kpi-sub" style="color:var(--text3)">${k.active_stores} active stores</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2 section">
+    <div class="card">
+      <div class="card-title">Revenue trend — last 7 days</div>
+      <div class="sparkline" id="sparkline">
+        ${d.daily_trend.map((t,i)=>`<div class="spark-bar" style="height:${Math.round(t.revenue/maxBar*100)}%" title="${fmt_date(t.date)}: ${fmt_currency(t.revenue)}"></div>`).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px">
+        <span style="font-size:11px;color:var(--text3)">${fmt_date(d.daily_trend[0]?.date||'')}</span>
+        <span style="font-size:12px;font-weight:500;color:var(--accent2)">${fmt_currency(d.daily_trend[d.daily_trend.length-1]?.revenue||0)} today</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Top stores by revenue (MTD)</div>
+      <div class="bar-chart">
+        ${d.store_revenue.slice(0,5).map(s=>`
+        <div class="bar-row">
+          <div class="bar-label">${s.store_name.replace('MedAxis - ','')}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.round(s.revenue/maxRev*100)}%;background:var(--accent)"></div></div>
+          <div class="bar-val">${fmt_currency(s.revenue)}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2 section">
+    <div class="card">
+      <div class="card-title">Fast-moving products (MTD)</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Product</th><th>Units</th><th>Revenue</th></tr></thead>
+          <tbody>
+            ${d.top_products.map(p=>`
+            <tr>
+              <td>${p.name}</td>
+              <td class="mono">${p.units_sold.toLocaleString()}</td>
+              <td class="mono">${fmt_currency(p.revenue)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-header" style="margin-bottom:10px">
+        <div class="card-title" style="margin-bottom:0">Active alerts</div>
+        <a href="#" onclick="navigate('alerts')" style="font-size:12px;color:var(--blue2)">View all →</a>
+      </div>
+      <div class="alert-item">
+        <div class="alert-dot red"></div>
+        <div><div class="alert-title">Critical: 4 SKUs below reorder point</div><div class="alert-sub">Insulin Glargine (3 units), Azithromycin (4 units)</div></div>
+      </div>
+      <div class="alert-item">
+        <div class="alert-dot amber"></div>
+        <div><div class="alert-title">${k.expiry_alerts} batches expiring within 30 days</div><div class="alert-sub">1 batch already expired — action required</div></div>
+      </div>
+      <div class="alert-item">
+        <div class="alert-dot blue"></div>
+        <div><div class="alert-title">${k.pending_transfers} transfer pending approval</div><div class="alert-sub">Insulin Glargine: Miyapur → Banjara Hills (20 units)</div></div>
+      </div>
+    </div>
+  </div>
+  </div>`;
+}
+
+// ── Inventory ─────────────────────────────────────────────────────────────
+async function renderInventory() {
+  const qs = selectedStore ? `?store_id=${selectedStore}` : '';
+  const stock = await api('GET', `/inventory/stock${qs}`);
+  if (!stock) return;
+
+  const cats = [...new Set(stock.map(i=>i.category))];
+  let activeFilter = '';
+
+  function render(filter) {
+    const filtered = filter ? stock.filter(i=>i.category===filter) : stock;
+    const tbody = filtered.map(i=>{
+      const pct = Math.min(100, Math.round(i.qty_on_hand / (i.reorder_point*3) * 100));
+      const cls = i.qty_on_hand <= i.reorder_point*0.3 ? 'stock-crit' : i.qty_on_hand <= i.reorder_point ? 'stock-warn' : 'stock-ok';
+      const badge = i.qty_on_hand <= i.reorder_point*0.3 ? '<span class="badge badge-red">Critical</span>' :
+                    i.qty_on_hand <= i.reorder_point ? '<span class="badge badge-amber">Low</span>' :
+                    '<span class="badge badge-green">OK</span>';
+      return `<tr>
+        <td><div style="font-weight:500">${i.name}</div><div style="font-size:11px;color:var(--text3)">${i.sku_id}</div></td>
+        <td><span class="badge badge-gray">${i.category}</span></td>
+        <td style="display:none" class="store-col">${i.store_name}</td>
+        <td>
+          <div class="stock-level">
+            <div class="stock-bar"><div class="stock-fill ${cls}" style="width:${pct}%"></div></div>
+            <span class="mono">${i.qty_on_hand}</span>
+          </div>
+        </td>
+        <td class="mono">${i.reorder_point}</td>
+        <td>${badge}</td>
+        <td class="mono">${fmt_currency(i.price)}</td>
+        <td><button class="btn btn-sm btn-ghost" onclick="openForecast('${i.sku_id}','${i.name}')">Forecast</button></td>
+      </tr>`;
+    }).join('');
+    document.getElementById('inv-tbody').innerHTML = tbody;
+    if (!selectedStore) document.querySelectorAll('.store-col').forEach(el=>el.style.display='');
+    document.querySelectorAll('.cat-filter').forEach(b=>b.classList.toggle('active',b.dataset.cat===filter));
+  }
+
+  document.getElementById('content').innerHTML = `
+  <div class="fade-in">
+  <div class="section-header">
+    <div class="section-title">Stock Levels <span class="badge badge-gray">${stock.length} items</span></div>
+    <div style="display:flex;gap:8px">
+      <input id="inv-search" type="text" placeholder="Search products..." style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:6px 10px;color:var(--text);font-size:13px;width:200px;outline:none" oninput="filterInventory(this.value)">
+      <button class="btn btn-sm btn-secondary" onclick="navigate('alerts')">View alerts</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+    <button class="btn btn-sm btn-ghost cat-filter active" data-cat="" onclick="renderCat('')">All</button>
+    ${cats.map(c=>`<button class="btn btn-sm btn-ghost cat-filter" data-cat="${c}" onclick="renderCat('${c}')">${c}</button>`).join('')}
+  </div>
+  <div class="card" style="padding:0">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th><th>Category</th>
+            ${!selectedStore?'<th class="store-col">Store</th>':''}
+            <th>Stock</th><th>Reorder Pt</th><th>Status</th><th>Price</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="inv-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+  </div>`;
+
+  window.renderCat = (cat) => { activeFilter=cat; render(cat); };
+  window.filterInventory = (q) => {
+    const rows = document.querySelectorAll('#inv-tbody tr');
+    rows.forEach(r => r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none');
+  };
+  render('');
+}
+
+async function openForecast(skuId, skuName) {
+  openModal('<div class="loading"><div class="spinner"></div> Running forecast model...</div>');
+  const f = await api('GET', `/ai/forecast/${skuId}`);
+  if (!f) return;
+  const maxP = Math.max(...f.predictions.map(p=>p.predicted_units));
+  document.getElementById('modal-content').innerHTML = `
+  <div class="modal-header">
+    <div class="modal-title">📊 Demand Forecast — ${skuName}</div>
+    <button class="btn-icon" onclick="closeModal()">✕</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+    <span class="badge badge-blue">${f.model}</span>
+    <span class="badge badge-green">Confidence: ${Math.round(f.confidence*100)}%</span>
+  </div>
+  <div style="margin-bottom:16px">
+    <div style="font-size:12px;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.3px;font-weight:500">14-Day Forecast</div>
+    <div style="display:flex;align-items:flex-end;gap:2px;height:60px">
+      ${f.predictions.map(p=>`<div style="flex:1;background:rgba(46,160,67,0.5);border-radius:2px 2px 0 0;height:${Math.round(p.predicted_units/maxP*100)}%;cursor:pointer" title="${p.date}: ${p.predicted_units} units"></div>`).join('')}
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px">
+      <span>${f.predictions[0].date}</span><span>${f.predictions[f.predictions.length-1].date}</span>
+    </div>
+  </div>
+  <div style="margin-bottom:14px">
+    <div style="font-size:12px;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.3px;font-weight:500">AI Recommendations</div>
+    ${f.recommendations.map(r=>`<div class="alert-item" style="margin-bottom:6px"><div class="alert-dot blue"></div><div>${r}</div></div>`).join('')}
+  </div>
+  <button class="btn btn-secondary" onclick="closeModal()">Close</button>`;
+}
+
+// ── Billing ───────────────────────────────────────────────────────────────
+async function renderBilling() {
+  const qs = selectedStore ? `?store_id=${selectedStore}&limit=30` : '?limit=30';
+  const [sales, products] = await Promise.all([
+    api('GET', `/billing/sales${qs}`),
+    api('GET', '/inventory/products')
+  ]);
+  if (!sales) return;
+
+  document.getElementById('content').innerHTML = `
+  <div class="fade-in">
+  <div class="grid-2 section">
+    <div class="card">
+      <div class="section-header" style="margin-bottom:12px">
+        <div class="section-title">Recent Transactions</div>
+        <button class="btn btn-sm btn-primary" onclick="openNewSale()">+ New Sale</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Invoice</th><th>Store</th><th>Items</th><th>Total</th><th>Mode</th><th>Time</th></tr></thead>
+          <tbody>
+            ${sales.slice(0,15).map(s=>`
+            <tr>
+              <td class="mono" style="color:var(--blue2)">${s.sale_id}</td>
+              <td style="font-size:12px">${(s.store_name||'').replace('MedAxis - ','')}</td>
+              <td class="mono">${s.items}</td>
+              <td class="mono">${fmt_currency(s.total)}</td>
+              <td><span class="badge ${s.payment_mode==='UPI'?'badge-blue':s.payment_mode==='Cash'?'badge-green':'badge-purple'}">${s.payment_mode}</span></td>
+              <td style="font-size:12px;color:var(--text3)">${fmt_date(s.date)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="card section">
+        <div class="card-title">Payment distribution</div>
+        ${['UPI','Cash','Card'].map(m=>{
+          const cnt = sales.filter(s=>s.payment_mode===m).length;
+          const pct = Math.round(cnt/sales.length*100);
+          const clr = m==='UPI'?'var(--blue)':m==='Cash'?'var(--accent)':'var(--purple)';
+          return `<div class="bar-row" style="margin-bottom:10px">
+            <div class="bar-label">${m}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${clr}"></div></div>
+            <div class="bar-val">${pct}%</div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="card">
+        <div class="card-title">Today's summary</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text2)">Gross sales</span><span class="mono">${fmt_currency(sales.filter(s=>s.date===new Date().toISOString().split('T')[0]).reduce((a,s)=>a+s.total,0)||148250)}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text2)">GST collected</span><span class="mono">${fmt_currency(17790)}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;padding-top:8px;border-top:1px solid var(--border)"><span style="font-weight:500">Net revenue</span><span class="mono" style="font-weight:600;color:var(--accent2)">${fmt_currency(130460)}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>`;
+
+  window.openNewSale = () => {
+    const stores = [{id:'S001',name:'Banjara Hills'},{id:'S002',name:'Kondapur'},{id:'S003',name:'Miyapur'},{id:'S004',name:'Secunderabad'},{id:'S005',name:'LB Nagar'}];
+    let cartItems = [];
+    function cartHtml() {
+      if (!cartItems.length) return '<div style="color:var(--text3);font-size:12px;padding:10px 0">No items added yet</div>';
+      return cartItems.map((it,i)=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <span>${it.name}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="mono">${it.qty} × ${fmt_currency(it.price)}</span>
+          <button class="btn-icon" onclick="removeItem(${i})" style="font-size:10px;width:22px;height:22px">✕</button>
+        </div>
+      </div>`).join('');
+    }
+    function totalHtml() {
+      const sub = cartItems.reduce((a,i)=>a+i.price*i.qty,0);
+      const gst = sub*0.12;
+      return `<div style="padding-top:8px;font-size:13px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--text2)">Subtotal</span><span class="mono">${fmt_currency(sub)}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:var(--text2)">GST (12%)</span><span class="mono">${fmt_currency(gst)}</span></div>
+        <div style="display:flex;justify-content:space-between;font-weight:600"><span>Total</span><span class="mono" style="color:var(--accent2)">${fmt_currency(sub+gst)}</span></div>
+      </div>`;
+    }
+    openModal(`
+    <div class="modal-header">
+      <div class="modal-title">New Sale</div>
+      <button class="btn-icon" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Store</label>
+        <select id="sale-store">${stores.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select>
+      </div>
+      <div class="form-group">
+        <label>Payment</label>
+        <select id="sale-payment"><option>UPI</option><option>Cash</option><option>Card</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Product</label>
+        <select id="sale-sku">${(products||[]).map(p=>`<option value="${p.sku_id}" data-price="${p.price}">${p.name}</option>`).join('')}</select>
+      </div>
+      <div class="form-group">
+        <label>Quantity</label>
+        <input type="number" id="sale-qty" value="1" min="1">
+      </div>
+    </div>
+    <button class="btn btn-secondary" style="width:100%;margin-bottom:14px" onclick="addToCart()">+ Add to cart</button>
+    <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px">Cart</div>
+    <div id="sale-cart">${cartHtml()}</div>
+    <div id="sale-total"></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" style="flex:1" onclick="submitSale()">Complete Sale</button>
+    </div>`);
+
+    window.addToCart = () => {
+      const sel = document.getElementById('sale-sku');
+      const price = parseFloat(sel.options[sel.selectedIndex].dataset.price);
+      const qty = parseInt(document.getElementById('sale-qty').value)||1;
+      const existing = cartItems.find(i=>i.sku_id===sel.value);
+      if (existing) existing.qty += qty;
+      else cartItems.push({sku_id:sel.value, name:sel.options[sel.selectedIndex].text, price, qty});
+      document.getElementById('sale-cart').innerHTML = cartHtml();
+      document.getElementById('sale-total').innerHTML = totalHtml();
+    };
+    window.removeItem = (idx) => {
+      cartItems.splice(idx,1);
+      document.getElementById('sale-cart').innerHTML = cartHtml();
+      document.getElementById('sale-total').innerHTML = cartItems.length ? totalHtml() : '';
+    };
+    window.submitSale = async () => {
+      if (!cartItems.length) { showToast('Add items to cart first','amber'); return; }
+      const r = await api('POST','/billing/sales',{
+        store_id: document.getElementById('sale-store').value,
+        items: cartItems.map(i=>({sku_id:i.sku_id,qty:i.qty})),
+        payment_mode: document.getElementById('sale-payment').value
+      });
+      if (r) { closeModal(); showToast(`✓ Invoice ${r.sale_id} created — ${fmt_currency(r.grand_total)}`); navigate('billing'); }
+    };
+  };
+}
+
+// ── Transfers ─────────────────────────────────────────────────────────────
+async function renderTransfers() {
+  const [transfers, products, stores] = await Promise.all([
+    api('GET','/inventory/transfers'),
+    api('GET','/inventory/products'),
+    api('GET','/stores')
+  ]);
+  if (!transfers) return;
+
+  const statusBadge = s => ({pending:'<span class="badge badge-amber">Pending</span>',approved:'<span class="badge badge-blue">Approved</span>',in_transit:'<span class="badge badge-purple">In Transit</span>',completed:'<span class="badge badge-green">Completed</span>'}[s]||`<span class="badge badge-gray">${s}</span>`);
+
+  document.getElementById('content').innerHTML = `
+  <div class="fade-in">
+  <div class="section-header">
+    <div class="section-title">Inter-Store Transfers <span class="badge badge-gray">${transfers.length}</span></div>
+    <button class="btn btn-sm btn-primary" onclick="openNewTransfer()">+ Request Transfer</button>
+  </div>
+  <div class="card" style="padding:0;margin-bottom:20px">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Product</th><th>Route</th><th>Qty</th><th>Status</th><th>Initiated by</th><th>Date</th><th></th></tr></thead>
+        <tbody>
+          ${transfers.map(t=>`
+          <tr>
+            <td class="mono" style="color:var(--blue2)">${t.transfer_id}</td>
+            <td style="font-weight:500">${t.sku_name}</td>
+            <td>
+              <div class="transfer-flow">
+                <span class="transfer-store">${(t.from_store_name||t.from_store).replace('MedAxis - ','')}</span>
+                <span class="transfer-arrow">→</span>
+                <span class="transfer-store">${(t.to_store_name||t.to_store).replace('MedAxis - ','')}</span>
+              </div>
+            </td>
+            <td class="mono">${t.qty}</td>
+            <td>${statusBadge(t.status)}</td>
+            <td style="font-size:12px;color:var(--text2)">${t.initiated_by}</td>
+            <td style="font-size:12px;color:var(--text3)">${fmt_date(t.created_at)}</td>
+            <td>
+              ${t.status==='pending'?`<button class="btn btn-sm btn-primary" onclick="approveTransfer('${t.transfer_id}')">Approve</button>`:''}
+              ${t.status==='approved'?`<button class="btn btn-sm btn-secondary" onclick="dispatchTransfer('${t.transfer_id}')">Dispatch</button>`:''}
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </div>`;
+
+  window.approveTransfer = async (id) => {
+    await api('PATCH',`/inventory/transfers/${id}/status`,{status:'approved'});
+    showToast('✓ Transfer approved'); navigate('transfers');
+  };
+  window.dispatchTransfer = async (id) => {
+    await api('PATCH',`/inventory/transfers/${id}/status`,{status:'in_transit'});
+    showToast('✓ Marked as in transit'); navigate('transfers');
+  };
+  window.openNewTransfer = () => {
+    openModal(`
+    <div class="modal-header">
+      <div class="modal-title">Request Stock Transfer</div>
+      <button class="btn-icon" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-group"><label>Product</label>
+      <select id="tr-sku">${(products||[]).map(p=>`<option value="${p.sku_id}">${p.name}</option>`).join('')}</select></div>
+    <div class="form-row">
+      <div class="form-group"><label>From Store</label>
+        <select id="tr-from">${(stores||[]).map(s=>`<option value="${s.id}">${s.name.replace('MedAxis - ','')}</option>`).join('')}</select></div>
+      <div class="form-group"><label>To Store</label>
+        <select id="tr-to">${(stores||[]).map((s,i)=>`<option value="${s.id}" ${i===1?'selected':''}>${s.name.replace('MedAxis - ','')}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-group"><label>Quantity</label><input type="number" id="tr-qty" value="20" min="1"></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" style="flex:1" onclick="submitTransfer()">Submit Request</button>
+    </div>`);
+    window.submitTransfer = async () => {
+      const r = await api('POST','/inventory/transfers',{
+        from_store: document.getElementById('tr-from').value,
+        to_store: document.getElementById('tr-to').value,
+        sku_id: document.getElementById('tr-sku').value,
+        qty: parseInt(document.getElementById('tr-qty').value)
+      });
+      if (r) { closeModal(); showToast('✓ Transfer request submitted'); navigate('transfers'); }
+    };
+  };
+}
+
+// ── Alerts ────────────────────────────────────────────────────────────────
+async function renderAlerts() {
+  const [lowStock, anomalies] = await Promise.all([
+    api('GET','/inventory/alerts/low-stock'),
+    api('GET','/ai/anomalies')
+  ]);
+
+  document.getElementById('content').innerHTML = `
+  <div class="fade-in">
+  <div class="section">
+    <div class="section-title" style="margin-bottom:12px">⚠ Low Stock Alerts <span class="badge badge-red">${(lowStock||[]).length}</span></div>
+    ${(lowStock||[]).map(a=>`
+    <div class="alert-item">
+      <div class="alert-dot ${a.severity==='critical'?'red':'amber'}"></div>
+      <div style="flex:1">
+        <div class="alert-title">${a.name} — ${(a.store_name||'').replace('MedAxis - ','')}</div>
+        <div class="alert-sub">${a.qty_on_hand} units remaining · Reorder point: ${a.reorder_point}</div>
+      </div>
+      <span class="badge ${a.severity==='critical'?'badge-red':'badge-amber'}">${a.severity}</span>
+      <button class="btn btn-sm btn-ghost" onclick="openForecast('${a.sku_id}','${a.name}')">Forecast</button>
+    </div>`).join('')}
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-title" style="margin-bottom:12px">🤖 AI Anomaly Flags <span class="badge badge-amber">${(anomalies||[]).filter(a=>!a.resolved).length} unresolved</span></div>
+    ${(anomalies||[]).map(a=>`
+    <div class="anomaly-card ${a.severity} ${a.resolved?'resolved':''}">
+      <div class="anomaly-header">
+        <div>
+          <span class="badge ${a.severity==='high'?'badge-red':'badge-amber'}" style="margin-bottom:5px;display:inline-flex">${a.severity.toUpperCase()}</span>
+          <span class="badge badge-gray" style="margin-left:4px">${a.type.replace(/_/g,' ')}</span>
+          <div style="font-size:13px;font-weight:500;margin-top:4px">${a.description}</div>
+          <div class="anomaly-score">Store: ${(a.store_name||'').replace('MedAxis - ','')} · SKU: ${a.sku_name} · Score: ${a.score}</div>
+          <div class="anomaly-score" style="margin-top:2px">Detected: ${fmt_time(a.timestamp)} ${fmt_date(a.timestamp)}</div>
+        </div>
+        ${a.resolved?'<span class="badge badge-green">Resolved</span>':
+          `<button class="btn btn-sm btn-ghost" onclick="resolveAnomaly('${a.id}')">Resolve</button>`}
+      </div>
+    </div>`).join('')}
+  </div>
+  </div>`;
+
+  window.resolveAnomaly = async (id) => {
+    await api('PATCH',`/ai/anomalies/${id}/resolve`);
+    showToast('✓ Anomaly marked as resolved'); renderAlerts();
+  };
+}
+
+// ── Expiry ────────────────────────────────────────────────────────────────
+async function renderExpiry() {
+  const items = await api('GET','/inventory/alerts/expiry?days=60');
+  if (!items) return;
+
+  document.getElementById('content').innerHTML = `
+  <div class="fade-in">
+  <div class="section-header">
+    <div class="section-title">Expiry Management <span class="badge badge-amber">${items.length} batches</span></div>
+  </div>
+  <div class="card" style="padding:0">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Batch ID</th><th>Product</th><th>Store</th><th>Lot No.</th><th>Expiry Date</th><th>Days Left</th><th>Qty</th><th>Status</th></tr></thead>
+        <tbody>
+          ${items.map(b=>{
+            const daysLeft = b.expires_in_days;
+            const badge = daysLeft < 0 ? '<span class="badge badge-red">Expired</span>' :
+              daysLeft <= 7 ? '<span class="badge badge-red">Expiring</span>' :
+              daysLeft <= 30 ? '<span class="badge badge-amber">Soon</span>' :
+              '<span class="badge badge-green">OK</span>';
+            return `<tr>
+              <td class="mono" style="color:var(--blue2)">${b.batch_id}</td>
+              <td style="font-weight:500">${b.name}</td>
+              <td style="font-size:12px">${(b.store_name||'').replace('MedAxis - ','')}</td>
+              <td class="mono">${b.lot_no}</td>
+              <td class="mono">${b.exp_date}</td>
+              <td class="mono" style="color:${daysLeft<0?'var(--red2)':daysLeft<=7?'var(--red2)':daysLeft<=30?'var(--amber2)':'var(--text)'}">${daysLeft < 0 ? Math.abs(daysLeft)+' days ago' : daysLeft+' days'}</td>
+              <td class="mono">${b.qty}</td>
+              <td>${badge}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </div>`;
+}
+
+// ── AI Insights ───────────────────────────────────────────────────────────
+async function renderAI() {
+  const [anomalies, products] = await Promise.all([
+    api('GET','/ai/anomalies'),
+    api('GET','/inventory/products')
+  ]);
+
+  let messages = [{role:'ai', text:'Hello! I\'m the MedAxis AI assistant. I can answer questions about inventory, sales, anomalies, and forecasts across all 37 stores. Try asking me something.', source:'system', ts: new Date()}];
+
+  function msgHtml(m) {
+    return m.role === 'user'
+      ? `<div class="msg msg-user">${m.text}</div>`
+      : `<div class="msg msg-ai">${m.text}${m.source?`<div class="msg-meta">source: ${m.source} · confidence: ${m.confidence||'—'}</div>`:''}</div>`;
+  }
+
+  function renderMessages() {
+    const box = document.getElementById('chat-msgs');
+    if (box) { box.innerHTML = messages.map(msgHtml).join(''); box.scrollTop = box.scrollHeight; }
+  }
+
+  const unresolved = (anomalies||[]).filter(a=>!a.resolved);
+
+  document.getElementById('content').innerHTML = `
+  <div class="fade-in">
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Conversational query</div>
+      <div class="suggestion-chips">
+        <div class="chip" onclick="askQuery('Which products are low on stock?')">Low stock status</div>
+        <div class="chip" onclick="askQuery('What is today\\'s revenue?')">Revenue today</div>
+        <div class="chip" onclick="askQuery('Show expiry wastage risk')">Expiry risk</div>
+        <div class="chip" onclick="askQuery('Pending stock transfers?')">Pending transfers</div>
+        <div class="chip" onclick="askQuery('What are the top fast-moving products?')">Fast movers</div>
+      </div>
+      <div class="chat-container">
+        <div class="chat-messages" id="chat-msgs">${messages.map(msgHtml).join('')}</div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chat-input" placeholder="Ask about inventory, sales, or operations..." onkeydown="if(event.key==='Enter')sendQuery()">
+          <button class="btn btn-primary btn-sm" onclick="sendQuery()">Ask</button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card section">
+        <div class="card-title">Active anomaly flags <span class="badge badge-red" style="margin-left:4px">${unresolved.length}</span></div>
+        ${unresolved.length === 0 ? '<div style="color:var(--text3);font-size:13px">No active anomalies 🎉</div>' :
+          unresolved.map(a=>`
+          <div style="padding:10px;background:var(--bg3);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:8px;border-left:3px solid ${a.severity==='high'?'var(--red2)':'var(--amber2)'}">
+            <div style="font-size:12px;font-weight:500;margin-bottom:3px">${a.description}</div>
+            <div style="font-size:11px;color:var(--text3)">${(a.store_name||'').replace('MedAxis - ','')} · score ${a.score}</div>
+          </div>`).join('')}
+      </div>
+
+      <div class="card">
+        <div class="card-title">Quick forecast</div>
+        <div class="form-group">
+          <label>Select Product</label>
+          <select id="fc-sku" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:7px 10px;color:var(--text);font-size:13px;width:100%;outline:none">
+            ${(products||[]).map(p=>`<option value="${p.sku_id}">${p.name}</option>`).join('')}
+          </select>
+        </div>
+        <button class="btn btn-secondary" style="width:100%" onclick="openForecast(document.getElementById('fc-sku').value, document.getElementById('fc-sku').options[document.getElementById('fc-sku').selectedIndex].text)">Run Forecast Model</button>
+      </div>
+    </div>
+  </div>
+  </div>`;
+
+  window.askQuery = async (q) => {
+    document.getElementById('chat-input').value = q;
+    await sendQuery();
+  };
+
+  window.sendQuery = async () => {
+    const input = document.getElementById('chat-input');
+    const q = input.value.trim();
+    if (!q) return;
+    messages.push({role:'user', text:q});
+    input.value = '';
+    renderMessages();
+    const r = await api('POST','/ai/query',{question:q});
+    if (r) messages.push({role:'ai', text:r.answer, source:r.data_source, confidence:`${Math.round((r.confidence||0)*100)}%`});
+    renderMessages();
+  };
+}
+
+// ── Reports ───────────────────────────────────────────────────────────────
+async function renderReports() {
+  const d = await api('GET','/reports/dashboard');
+  if (!d) return;
+  const maxR = Math.max(...d.store_revenue.map(s=>s.revenue));
+
+  document.getElementById('content').innerHTML = `
+  <div class="fade-in">
+  <div class="section">
+    <div class="section-title" style="margin-bottom:14px">Business Intelligence — Month to Date</div>
+    <div class="grid-4" style="margin-bottom:20px">
+      <div class="kpi-card"><div class="kpi-label">Total Revenue</div><div class="kpi-value">${fmt_currency(d.kpis.month_revenue)}</div><div class="kpi-sub kpi-up">↑ ${d.kpis.yoy_growth}% YoY</div></div>
+      <div class="kpi-card"><div class="kpi-label">Active Stores</div><div class="kpi-value">${d.kpis.active_stores}</div><div class="kpi-sub" style="color:var(--text3)">of 37 total</div></div>
+      <div class="kpi-card"><div class="kpi-label">Wastage Risk</div><div class="kpi-value kpi-warn">₹7,200</div><div class="kpi-sub" style="color:var(--text3)">6 expiring batches</div></div>
+      <div class="kpi-card"><div class="kpi-label">Avg Sale Value</div><div class="kpi-value">₹433</div><div class="kpi-sub kpi-up">↑ 8.2% vs last month</div></div>
+    </div>
+  </div>
+
+  <div class="grid-2 section">
+    <div class="card">
+      <div class="card-title">Store revenue breakdown</div>
+      <div class="bar-chart">
+        ${d.store_revenue.map(s=>`
+        <div class="bar-row">
+          <div class="bar-label">${s.store_name.replace('MedAxis - ','')}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.round(s.revenue/maxR*100)}%;background:var(--blue)"></div></div>
+          <div class="bar-val">${fmt_currency(s.revenue)}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Category mix (units sold)</div>
+      ${[['Analgesics','34%','var(--accent)'],['Antidiabetic','22%','var(--blue)'],['Antibiotics','18%','var(--purple)'],['Cardiac','12%','var(--amber)'],['Others','14%','var(--bg4)']].map(([cat,pct,clr])=>`
+      <div class="bar-row" style="margin-bottom:10px">
+        <div class="bar-label">${cat}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct};background:${clr}"></div></div>
+        <div class="bar-val">${pct}</div>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <div class="card section">
+    <div class="section-header" style="margin-bottom:12px">
+      <div class="card-title" style="margin-bottom:0">Top 5 fast-moving products</div>
+      <button class="btn btn-sm btn-ghost" onclick="showToast('Export feature in full build')">Export CSV</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Rank</th><th>Product</th><th>Units Sold</th><th>Revenue</th><th>% of Total</th></tr></thead>
+        <tbody>
+          ${d.top_products.map((p,i)=>{
+            const pct = Math.round(p.revenue/d.kpis.month_revenue*100*10)/10;
+            return `<tr>
+              <td class="mono" style="color:var(--text3)">#${i+1}</td>
+              <td style="font-weight:500">${p.name}</td>
+              <td class="mono">${p.units_sold.toLocaleString()}</td>
+              <td class="mono">${fmt_currency(p.revenue)}</td>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="bar-track" style="width:80px"><div class="bar-fill" style="width:${pct*5}%;background:var(--accent)"></div></div><span class="mono">${pct}%</span></div></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </div>`;
+}
+
+// ── Modal helpers ─────────────────────────────────────────────────────────
+function openModal(html) {
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').style.display = 'flex';
+}
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').style.display = 'none';
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.getElementById('login-password').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+</script>
+</body>
+</html>
